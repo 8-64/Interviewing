@@ -4,9 +4,10 @@ use v5.24;
 use warnings;
 
 use Test::More;
+use Benchmark ':hireswallclock';
 
 my @data = ();
-push (@data, int rand 10000) for 1..100;
+push (@data, int rand 10000) for 1..250;
 
 # 1) Bubble sort
 sub BubbleSort {
@@ -29,9 +30,6 @@ sub BubbleSort {
     return @data;
 }
 
-say "BubbleSort";
-my @bubble_data = BubbleSort(@data);
-
 # 2) Quick $sort
 sub QuickSort {
     my @data = @_;
@@ -46,9 +44,6 @@ sub QuickSort {
 
     return (QuickSort(@left), $pivot, QuickSort(@right));
 }
-
-say "QuickSort";
-my @quicksort_data = QuickSort(@data);
 
 # 3) Insertion sort
 sub InsertionSort {
@@ -70,9 +65,6 @@ sub InsertionSort {
 
     return @data;
 }
-
-say "InsertionSort";
-my @insertion_data = InsertionSort(@data);
 
 # 4) Merge sort
 sub MergeSort {
@@ -109,9 +101,6 @@ sub MergeSort {
     return @{ $data[0] };
 }
 
-say "MergeSort";
-my @merge_data = MergeSort(@data);
-
 # 5) Stooge sort
 sub StoogeSort {
     my @data = @_;
@@ -145,9 +134,6 @@ sub StoogeSort {
     return @data;
 }
 
-say "StoogeSort";
-my @stooge_data = StoogeSort(@data);
-
 # 6) Pancake sort
 sub PancakeSort {
     my @data = @_;
@@ -171,9 +157,6 @@ sub PancakeSort {
     return (@data);
 }
 
-say "PancakeSort";
-my @pancake_data = PancakeSort(@data);
-
 # 7) Gnome sort
 sub GnomeSort {
     my @data = @_;
@@ -191,9 +174,6 @@ sub GnomeSort {
 
     return (@data);
 }
-
-say "GnomeSort";
-my @gnome_data = GnomeSort(@data);
 
 # 8) Odd-even sort
 sub OddEvenSort {
@@ -221,22 +201,31 @@ sub OddEvenSort {
     return (@data);
 }
 
-say "OddEvenSort";
-my @odd_even_data = OddEvenSort(@data);
+# Autodetect sorts
+my @sorts;
+foreach (keys %::) {
+    if (/Sort$/) {
+        push(@sorts, [ $_, \&$_]);
+    }
+}
 
-say 'Verification of sorts: @bubble_data == @quicksort_data ?';
-is_deeply(\@bubble_data, \@quicksort_data);
-say 'Verification of sorts: @bubble_data == @insertion_data ?';
-is_deeply(\@bubble_data, \@insertion_data);
-say 'Verification of sorts: @bubble_data == @merge_data ?';
-is_deeply(\@bubble_data, \@merge_data);
-say 'Verification of sorts: @bubble_data == @stooge_data ?';
-is_deeply(\@bubble_data, \@stooge_data);
-say 'Verification of sorts: @bubble_data == @pancake_data ?';
-is_deeply(\@bubble_data, \@pancake_data);
-say 'Verification of sorts: @bubble_data == @gnome_data ?';
-is_deeply(\@bubble_data, \@gnome_data);
-say 'Verification of sorts: @bubble_data == @odd_even_data ?';
-is_deeply(\@bubble_data, \@odd_even_data);
+# Sort sorts :-)
+@sorts = sort { $a->[0] cmp $b->[0] } @sorts;
 
+# Run them all, test and benchmark
+my @compare = ();
+foreach my $sort (@sorts) {
+    say "\nRunning $sort->[0]:";
+
+    my $t0 = Benchmark->new;
+    my @sorted = $sort->[1]->(@data);
+    my $t1 = Benchmark->new;
+    say 'Sort took: ' . timestr(timediff($t1, $t0));
+
+    say "Unsorted/sorted array sizes: @{[scalar @data]}/@{[scalar @sorted]}";
+    if (scalar @compare) {
+        is_deeply(\@sorted, \@compare, "Are results from $sort->[0] the same as in previous case?");
+    }
+    @compare = @sorted;
+}
 done_testing();
