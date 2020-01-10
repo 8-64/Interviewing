@@ -201,6 +201,53 @@ sub OddEvenSort {
     return (@data);
 }
 
+# 9) Bucket sort
+sub BucketSort {
+    my @data = @_;
+    my $N = scalar @data;
+    # Straightforwardly sort when 16 elements or less
+    my $n_buckets = ($N < 17)
+        ? $N
+        : int sqrt $N;
+    my @result;
+
+    while ($n_buckets--) {
+        # Create buckets
+        my $num = pop @data;
+        my $i = 0;
+        {
+            if (exists $result[$i]->[0]) {
+                ($result[$i]->[0], $num) = ($num, $result[$i]->[0]) if ($result[$i]->[0] > $num);
+                $i++;
+                redo;
+            } else {
+                $result[$i]->[0] = $num;
+            }
+        }
+    }
+
+    # Now, fill buckets
+    NUM_TO_BUCKET:
+    foreach my $num (@data) {
+        for (my $j = 0; $j <= $#result; $j++) {
+            if ($num < $result[$j]->[0]) {
+                # Then put it into the bucket
+                push($result[$j]->@*, $num);
+                next NUM_TO_BUCKET;
+            }
+        }
+        push($result[-1]->@*, $num);
+    }
+
+    return(map { @$_ } @result) if ($N < 17);
+
+    # Sort bucket contents
+    foreach (@result) { $_ = [ BucketSort(@$_) ] }
+
+    # Flatten here and above
+    return(map { @$_ } @result);
+}
+
 # Autodetect sorts
 my @sorts;
 foreach (keys %::) {
