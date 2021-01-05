@@ -7,7 +7,7 @@ use Test::More;
 use Benchmark ':hireswallclock';
 
 my @data = ();
-push (@data, int rand 10000) for 1..250;
+push (@data, int rand 10000) for 1..300;
 
 # 1) Bubble sort
 sub BubbleSort {
@@ -246,6 +246,16 @@ sub BucketSort {
 
     # Flatten here and above
     return(map { @$_ } @result);
+}
+
+# 10) Counting sort
+sub CountingSort {
+    my @data = @_;
+    my (@seen, @result, $k, $v);
+
+    $seen[$_]++ foreach @data;
+    while (($k, $v) = each @seen) { push (@result, $k) while $v-- }
+    return @result;
 }
 
 # Autodetect sorts
