@@ -25,4 +25,4 @@ ps -ef | perl -nE "say if 1..1 or eof"
 # 3) Print the first and the third coulums of the command output
 ls -ahl | cut -f1,3 -d' '
 # OR, in Perl:
-ls -ahl | perl -F'\s+' -E 'say "@F[0,2]"
+ls -ahl | perl -F'\s+' -E 'say "@F[0,2]"'
