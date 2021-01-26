@@ -23,7 +23,6 @@ sub maxGuests ($log) {
     my $max_time = max (keys %entry_times, keys %leave_times);
     my $min_time = min (keys %entry_times, keys %leave_times);
 
-    # iterate over from time in first entry till the time in the last entry
     # for each time
         # next if does not exist key in both of those hash maps
         # if there are guests arriving -> increment guests counter
