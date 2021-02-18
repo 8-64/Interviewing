@@ -26,3 +26,8 @@ ps -ef | perl -nE "say if 1..1 or eof"
 ls -ahl | cut -f1,3 -d' '
 # OR, in Perl:
 ls -ahl | perl -F'\s+' -E 'say "@F[0,2]"'
+
+# 4) Count the number of active processes
+ps -ef --no-headers | wc -l
+# OR, absolutely precise, without influencing the number by observation:
+perl -E '$a=-1;opendir(P, q[/proc]); /\A[0-9]+\Z/ and ++$a while readdir P; say $a'

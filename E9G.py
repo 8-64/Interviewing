@@ -16,7 +16,7 @@ print(WordTransform("A"))
 
 # Transform string like "Rick Sanchez" ->  into "R. Sanchez"
 def ShortenName (word):
-  name, rest = re.split('\s+', word)
+  name, rest = re.split('\s+', word, 1)
   name = name[0:1] + ". "
   return name + rest
 
