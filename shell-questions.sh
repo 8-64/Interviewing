@@ -30,4 +30,9 @@ ls -ahl | perl -F'\s+' -E 'say "@F[0,2]"'
 # 4) Count the number of active processes
 ps -ef --no-headers | wc -l
 # OR, absolutely precise, without influencing the number by observation:
-perl -E '$a=-1;opendir(P, q[/proc]); /\A[0-9]+\Z/ and ++$a while readdir P; say $a'
+perl -E '$a=-1; opendir(P, q[/proc]); /\A[0-9]+\Z/ and ++$a while readdir P; say $a'
+
+# 5) Count specific word in a file
+grep -ci "\bhost\b" ./testgrep.txt
+# OR in Perl
+perl -nE 'BEGIN{$w=shift} /\b$w\b/i and $a++; END{say $a}' "host" ./testgrep.txt
